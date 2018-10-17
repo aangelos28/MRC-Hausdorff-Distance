@@ -9,7 +9,7 @@ def main():
 
     args = parse_arguments()
 
-    mrc_file_1 = readMRCFile(args.set_1)
+    mrc_file_1 = readMRCFile(args.set1)
 
     #np.set_printoptions(threshold=np.inf)
     print(mrc_file_1.data.shape)
@@ -25,8 +25,8 @@ def parse_arguments():
 
     parser = argparse.ArgumentParser(description="Hausdorff Distance Solver for 2 Sets.")
 
-    parser.add_argument("--set1", required=True, help="The first set of points in MRC format", dest="set_1")
-    parser.add_argument("--set2", required=True, help="The second set of points in MRC format", dest="set_2")
+    parser.add_argument("--set1", required=True, help="The first set of points in MRC format", dest="set1")
+    parser.add_argument("--set2", required=True, help="The second set of points in MRC format", dest="set2")
     parser.add_argument("--outputPDB", "-o", required=True, help="The output x0 and y0 points in PDB format.", dest="output_pdb_path")
 
     return parser.parse_args()
