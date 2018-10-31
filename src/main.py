@@ -1,6 +1,10 @@
 import mrcfile
-import numpy as np
 import argparse
+
+# TEMP
+import time
+
+import hausdorff
 
 def main():
     """
@@ -9,14 +13,20 @@ def main():
 
     args = parse_arguments()
 
-    mrc_file_1 = readMRCFile(args.set1)
-
     #np.set_printoptions(threshold=np.inf)
-    print(mrc_file_1.data.shape)
-    print(mrc_file_1.data)
+
+    mrc_file_1 = readMRCFile(args.mrc1)
+    mrc_file_2 = readMRCFile(args.mrc2)
+
+    start = time.time()
+    result = hausdorff.compute_hausdorff_distance_3D(mrc_file_1.data, mrc_file_2.data)
+    print("Hausdorff Distance: {}".format(result[0]))
+    end = time.time()
+    print("Execution Time: {}s".format(end-start))
 
     # Close file handles
     mrc_file_1.close()
+    mrc_file_2.close()
 
 def parse_arguments():
     """
@@ -25,8 +35,8 @@ def parse_arguments():
 
     parser = argparse.ArgumentParser(description="Hausdorff Distance Solver for 2 Sets.")
 
-    parser.add_argument("--set1", required=True, help="The first set of points in MRC format", dest="set1")
-    parser.add_argument("--set2", required=True, help="The second set of points in MRC format", dest="set2")
+    parser.add_argument("--mrc1", required=True, help="The first set of points in MRC format", dest="mrc1")
+    parser.add_argument("--mrc2", required=True, help="The second set of points in MRC format", dest="mrc2")
     parser.add_argument("--outputPDB", "-o", required=True, help="The output x0 and y0 points in PDB format.", dest="output_pdb_path")
 
     return parser.parse_args()
