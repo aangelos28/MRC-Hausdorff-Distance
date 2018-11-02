@@ -46,47 +46,54 @@ class Point3D():
     def to_string(self):
         return "({0},{1},{2})".format(self.__x, self.__y, self.__z)
     
-class Point2D():
-    """
-    Represents a point in 2D space.
-    """
-
-    def __init__(self, x, y, z):
-        self.__x = x
-        self.__y = y
-
-    @property
-    def x(self): return self.__x
-
-    @property
-    def y(self): return self.__y
-
-    def set_values(self, x, y):
-        self.__x = x
-        self.__y = y
-
-    def to_string(self):
-        return "({1},{2})".format(self.__x, self.__y)
-
 @jit(nopython=True)
 def compute_euclidean_distance_3D(point1, point2):
     """
     Computes and returns the euclidean distance for two points in 3D space.
+
+    Args:
+        point1: The first point
+        point2: The second point
+
+    Returns:
+        The Euclidean distance of the two points in 3D space
     """
 
     return sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2) + pow(point1.z - point2.z, 2))
 
-def compute_euclidean_distance_2D(point1, point2):
-    """
-    Computes and returns the euclidean distance for two points in 2D space.
-    """
-
-    return sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2))
 
 @jit(nopython=True)
 def compute_hausdorff_distance_3D(grid1, grid2):
     """
-    Computes and returns the hausdorff distance for two 3D grids of MRC format.
+    Computes and returns the Hausdorff distance for two 3D grids of MRC format.
+
+    Args:
+        grid1: The first grid of points in MRC format
+        grid2: The second grid of points in MRC format
+
+    Returns:
+        The Hausdorff distance of the two 3D grids
+    """
+
+    directedDistance1 = compute_directed_hausdorff_distance_3D(grid1, grid2)
+    directedDistance2 = compute_directed_hausdorff_distance_3D(grid2, grid1)
+
+    if directedDistance1[0] > directedDistance2[0]:
+        return (directedDistance1[0], directedDistance1[1], directedDistance1[2])
+    else:
+        return (directedDistance2[0], directedDistance2[1], directedDistance2[2])
+
+@jit(nopython=True, fastmath=True)
+def compute_directed_hausdorff_distance_3D(grid1, grid2):
+    """
+    Computes and returns the directed Hausdorff distance for two 3D grids of MRC format.
+
+    Args:
+        grid1: The first grid of points in MRC format (origin)
+        grid2: The second grid of points in MRC format (destination)
+
+    Returns:
+        The directed Hausdorff distance of the two 3D grids
     """
 
     max_distance = 0
