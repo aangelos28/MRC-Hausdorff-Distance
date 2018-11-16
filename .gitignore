@@ -1,4 +1,6 @@
-.vscode
-env
+.vscode/
+env/
+data/
+__pycache__
 *.pyc
 *.pdb
