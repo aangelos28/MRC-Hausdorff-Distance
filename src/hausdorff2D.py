@@ -1,4 +1,5 @@
 import numpy as np
+import mrcfile
 from math import (sqrt, pow, inf)
 from numba import jit, jitclass
 from numba import float32
@@ -29,8 +30,34 @@ class Point2D():
         self.__y = y
 
     def to_string(self):
-        return "({1},{2})".format(self.__x, self.__y)
+        return "({1}, {2})".format(self.__x, self.__y)
 
+def point2D_to_mrc_file(output_mrc_filename, origin_plane, point):
+    """
+    Outputs the passed point as an MRC file based on its original MRC file.
+    The point will have double the density of the maximum density of the original MRC.
+
+    Args:
+        output_mrc_filename: Path of the output MRC file
+        origin_plane: The plane the point originated from
+        point: The point to output
+
+    Returns:
+        Handle to new MRC file.
+    """
+
+    # Create a zero array with the same shape as the original
+    new_plane = np.copy(origin_plane)
+
+    # Determine largest element
+    max_element = np.amax(new_plane)
+
+    # Set the element identified by the point to twice the value of the max_element so it can be distinguished
+    new_plane[int(point.x), int(point.y)] = max_element * 2
+
+    return mrcfile.new(name=output_mrc_filename, data=new_plane, overwrite=True)
+
+@jit(nopython=True)
 def compute_euclidean_distance_2D(point1, point2):
     """
     Computes and returns the euclidean distance for two points in 2D space.
@@ -66,7 +93,7 @@ def compute_hausdorff_distance_2D(plane1, plane2):
     else:
         return (directedDistance2[0], directedDistance2[1], directedDistance2[2])
 
-@jit(nopython=True, fastmath=True)
+@jit(nopython=True)
 def compute_directed_hausdorff_distance_2D(plane1, plane2):
     """
     Computes and returns the directed Hausdorff distance for two 2D planes of MRC format.
@@ -122,4 +149,4 @@ def compute_directed_hausdorff_distance_2D(plane1, plane2):
             point_max.set_values(point1.x, point1.y)
             point_min.set_values(temp_point_min.x, temp_point_min.y)
 
-    return (max_distance, point_min, point_max)
+    return (max_distance, (point_min, plane2), (point_max, plane1))

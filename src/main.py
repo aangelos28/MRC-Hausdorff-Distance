@@ -1,5 +1,6 @@
-import mrcfile
+import numpy as np
 import argparse
+import mrcfile
 from termcolor import colored
 
 # TEMP
@@ -22,14 +23,33 @@ def main():
 
     # 2D data
     if is_2D(mrc_file_1.data) and is_2D(mrc_file_2.data):
+
+        # Ensure that we are not using ZHD
+        if args.algorithm == "zhd":
+            print(colored("ZHD only works for 3D data.\n", "red"))
+            quit()
+
         print(colored("Computing Hausdorff distance for 2D data...\n", "green"))
 
         start = time.time()
 
+        # Compute the Hausdorff distance
         result = hausdorff2D.compute_hausdorff_distance_2D(mrc_file_1.data, mrc_file_2.data)
-        print("Hausdorff Distance: {}".format(result[0]))
-        print("Point x0: ({},{})".format(result[1].x, result[1].y))
-        print("Point y0: ({},{})".format(result[2].x, result[2].y))
+        result = hausdorff_result_to_dict(result)
+
+        # Output point x0 to mrc file
+        x0_mrc_file = hausdorff2D.point2D_to_mrc_file(args.output_mrc1, result["x0_origin"], result["x0"])
+
+        # Output point y0 to mrc file
+        y0_mrc_file = hausdorff2D.point2D_to_mrc_file(args.output_mrc2, result["y0_origin"], result["y0"])
+
+        # Close output mrc files
+        x0_mrc_file.close()
+        y0_mrc_file.close()
+
+        print("Hausdorff Distance: {}".format(result["max_distance"]))
+        print("Point x0: ({},{})".format(result["x0"].x, result["x0"].y))
+        print("Point y0: ({},{})".format(result["y0"].x, result["y0"].y))
         end = time.time()
 
         print("\nExecution Time: {}s".format(end-start))
@@ -42,10 +62,28 @@ def main():
 
         start = time.time()
 
-        result = hausdorff3D.compute_hausdorff_distance_3D(mrc_file_1.data, mrc_file_2.data)
-        print("Hausdorff Distance: {}".format(result[0]))
-        print("Point x0: ({},{},{})".format(result[1].x, result[1].y, result[1].z))
-        print("Point y0: ({},{},{})".format(result[2].x, result[2].y, result[2].z))
+        # Compute the Hausdorff distance
+        result = None
+        if args.algorithm == "earlybreak":
+            result = hausdorff3D.compute_hausdorff_distance_3D(mrc_file_1.data, mrc_file_2.data)
+        else:
+            result = hausdorff3D.compute_hausdorff_distance_3D_ZHD(8, mrc_file_1.data, mrc_file_2.data)
+
+        result = hausdorff_result_to_dict(result)
+
+        # Output point x0 to mrc file
+        x0_mrc_file = hausdorff3D.point3D_to_mrc_file(args.output_mrc1, result["x0_origin"], result["x0"])
+
+        # Output point y0 to mrc file
+        y0_mrc_file = hausdorff3D.point3D_to_mrc_file(args.output_mrc2, result["y0_origin"], result["y0"])
+
+        # Close output mrc files
+        x0_mrc_file.close()
+        y0_mrc_file.close()
+
+        print("Hausdorff Distance: {}".format(result["max_distance"]))
+        print("Point x0: ({},{},{})".format(result["x0"].x, result["x0"].y, result["x0"].z))
+        print("Point y0: ({},{},{})".format(result["y0"].x, result["y0"].y, result["y0"].z))
         end = time.time()
 
         print("\nExecution Time: {}s".format(end-start))
@@ -59,6 +97,26 @@ def main():
     # Close file handles
     mrc_file_1.close()
     mrc_file_2.close()
+
+def hausdorff_result_to_dict(haudorff_result):
+    """
+    Converts the tuple returned by the Hausdorff distance functions to a dictionary
+    for easier use.
+
+    Args:
+        haudorff_result: Tuple returned from Hausdorff distance function
+
+    Returns:
+        Dictionary version of the tuple.
+    """
+
+    return {
+        "max_distance": haudorff_result[0],
+        "x0": haudorff_result[1][0],
+        "x0_origin": haudorff_result[1][1],
+        "y0": haudorff_result[2][0],
+        "y0_origin": haudorff_result[2][1]
+    }
 
 def is_2D(mrc_data):
     """
@@ -82,7 +140,9 @@ def parse_arguments():
 
     parser.add_argument("--mrc1", required=True, help="The first set of points in MRC format", dest="mrc1")
     parser.add_argument("--mrc2", required=True, help="The second set of points in MRC format", dest="mrc2")
-    parser.add_argument("--outputPDB", "-o", required=True, help="The output x0 and y0 points in PDB format.", dest="output_pdb_path")
+    parser.add_argument("--outputMrc1", required=True, help="The output x0 point in MRC format.", dest="output_mrc1")
+    parser.add_argument("--outputMrc2", required=True, help="The output y0 point in MRC format.", dest="output_mrc2")
+    parser.add_argument("--algorithm", "-a", required=False, choices=["earlybreak", "zhd"], default="earlybreak", help="The algorithm to use.", dest="algorithm")
 
     return parser.parse_args()
 
