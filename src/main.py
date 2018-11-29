@@ -67,7 +67,7 @@ def main():
         if args.algorithm == "earlybreak":
             result = hausdorff3D.compute_hausdorff_distance_3D(mrc_file_1.data, mrc_file_2.data)
         else:
-            result = hausdorff3D.compute_hausdorff_distance_3D_ZHD(8, mrc_file_1.data, mrc_file_2.data)
+            result = hausdorff3D.compute_hausdorff_distance_3D_ZHD(12, mrc_file_1.data, mrc_file_2.data)
 
         result = hausdorff_result_to_dict(result)
 

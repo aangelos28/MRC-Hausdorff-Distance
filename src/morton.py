@@ -1,3 +1,6 @@
+from numba import jit
+
+@jit(nopython=True)
 def morton3D(k, x, y, z):
     """
     Computes and returns the morton code of the x, y, z coordinates each
@@ -17,6 +20,7 @@ def morton3D(k, x, y, z):
 
     return result
 
+@jit(nopython=True)
 def morton2D(k, x, y):
     """
     Computes and returns the morton code of the x, y coordinates each
@@ -76,7 +80,8 @@ def extract_morton_coords_bin(dim, k, morton_code):
     else:
         return []
 
-def extract_morton_coords_int(dim, k, morton_code):
+@jit(nopython=True)
+def extract_morton_coords_int_3D(k, morton_code):
     """
     Creates a list containing the extracted coordinates in integer format 
     from the morton code in the order in which they were encoded
@@ -90,19 +95,8 @@ def extract_morton_coords_int(dim, k, morton_code):
         List containing the extracted coordinates in integer format
     """
 
-    # 3D
-    if dim == 3:
-        x = morton_code >> 2*k
-        y = (morton_code >> k) & ((1 << (2*k - k)) - 1)
-        z = morton_code & ((1 << k) - 1)
+    x = morton_code >> 2*k
+    y = (morton_code >> k) & ((1 << (2*k - k)) - 1)
+    z = morton_code & ((1 << k) - 1)
 
-        return [x, y, z]
-
-    # 2D
-    elif dim == 2:
-        x = morton_code >> k
-        y = morton_code & ((1 << k) - 1)
-        
-        return [x, y]    
-    else:
-        return []
+    return [x, y, z]  
