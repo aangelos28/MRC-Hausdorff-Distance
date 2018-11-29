@@ -1,5 +1,3 @@
-from numba import jit
-
 def morton3D(k, x, y, z):
     """
     Computes and returns the morton code of the x, y, z coordinates each
@@ -92,14 +90,19 @@ def extract_morton_coords_int(dim, k, morton_code):
         List containing the extracted coordinates in integer format
     """
 
-    morton_code_str = morton_to_string(dim, k, morton_code)
-
     # 3D
     if dim == 3:
-        return [int(morton_code_str[0:k], 2), int(morton_code_str[k:2*k], 2), int(morton_code_str[2*k:3*k], 2)]
+        x = morton_code >> 2*k
+        y = (morton_code >> k) & ((1 << (2*k - k)) - 1)
+        z = morton_code & ((1 << k) - 1)
+
+        return [x, y, z]
 
     # 2D
     elif dim == 2:
-        return [int(morton_code_str[0:k], 2), int(morton_code_str[k:2*k], 2)]
+        x = morton_code >> k
+        y = morton_code & ((1 << k) - 1)
+        
+        return [x, y]    
     else:
         return []
