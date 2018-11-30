@@ -1,8 +1,8 @@
 import numpy as np
 import mrcfile
 from math import (sqrt, pow, inf)
-from numba import jit, jitclass
-from numba import int32
+from concurrent.futures import ThreadPoolExecutor
+from numba import (jit, jitclass, int32)
 from morton import (morton3D, extract_morton_coords_int_3D)
 
 spec_Point3D = [
@@ -77,7 +77,7 @@ def point3D_to_mrc_file(output_mrc_filename, origin_grid, point):
 # EARLYBREAK        
 #################################################
 
-@jit(nopython=True)
+@jit(nopython=True, cache=True)
 def compute_euclidean_distance_3D(point1, point2):
     """
     Computes and returns the euclidean distance for two points in 3D space.
@@ -92,7 +92,6 @@ def compute_euclidean_distance_3D(point1, point2):
 
     return sqrt(pow(point1.x - point2.x, 2) + pow(point1.y - point2.y, 2) + pow(point1.z - point2.z, 2))
 
-@jit(nopython=True)
 def compute_hausdorff_distance_3D(grid1, grid2):
     """
     Computes and returns the Hausdorff distance for two 3D grids of MRC format.
@@ -105,15 +104,22 @@ def compute_hausdorff_distance_3D(grid1, grid2):
         The Hausdorff distance of the two 3D grids
     """
 
-    directedDistance1 = compute_directed_hausdorff_distance_3D(grid1, grid2)
-    directedDistance2 = compute_directed_hausdorff_distance_3D(grid2, grid1)
+    executor = ThreadPoolExecutor(max_workers=2)
+
+    future1 = executor.submit(compute_directed_hausdorff_distance_3D, grid1, grid2)
+    future2 = executor.submit(compute_directed_hausdorff_distance_3D, grid2, grid1)
+
+    directedDistance1 = future1.result()
+    directedDistance2 = future2.result()
+
+    executor.shutdown()
 
     if directedDistance1[0] > directedDistance2[0]:
         return directedDistance1
     else:
         return directedDistance2
 
-@jit(nopython=True)
+@jit(nopython=True, nogil=True)
 def compute_directed_hausdorff_distance_3D(grid1, grid2):
     """
     Computes and returns the directed Hausdorff distance for two 3D grids of MRC format.
@@ -175,7 +181,7 @@ def compute_directed_hausdorff_distance_3D(grid1, grid2):
 # ZHD        
 #################################################
 
-@jit(nopython=True)
+@jit(nopython=True, cache=True)
 def mrc_z_order(k, grid):
     """
     Creates a 1-D z-order array representation of the passed 3D MRC file
@@ -201,12 +207,10 @@ def mrc_z_order(k, grid):
 
         index += 1
 
-    #z_order_array_trimmed = np.where(z_order_array != 0, )
     z_order_array = z_order_array[z_order_array != -1]
 
     return np.sort(z_order_array)
 
-@jit(nopython=True)
 def compute_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
     """
     Computes and returns the Hausdorff distance for two 3D grids of MRC format.
@@ -219,15 +223,22 @@ def compute_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
         The Hausdorff distance of the two 3D grids
     """
 
-    directedDistance1 = compute_directed_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2)
-    directedDistance2 = compute_directed_hausdorff_distance_3D_ZHD(morton_bits, grid2, grid1)
+    executor = ThreadPoolExecutor(max_workers=2)
+
+    future1 = executor.submit(compute_directed_hausdorff_distance_3D_ZHD, morton_bits, grid1, grid2)
+    future2 = executor.submit(compute_directed_hausdorff_distance_3D_ZHD, morton_bits, grid2, grid1)
+
+    directedDistance1 = future1.result()
+    directedDistance2 = future2.result()
+
+    executor.shutdown()
 
     if directedDistance1[0] > directedDistance2[0]:
         return directedDistance1
     else:
         return directedDistance2
 
-@jit(nopython=True)
+@jit(nopython=True, fastmath=True)
 def compute_directed_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
 
     # Get Z-order curves of the two grids
