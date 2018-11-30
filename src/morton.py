@@ -1,4 +1,5 @@
 from numba import jit
+import numpy as np
 
 @jit(nopython=True, nogil=True, cache=True)
 def morton3D(k, x, y, z):
@@ -99,4 +100,4 @@ def extract_morton_coords_int_3D(k, morton_code):
     y = (morton_code >> k) & ((1 << (2*k - k)) - 1)
     z = morton_code & ((1 << k) - 1)
 
-    return [x, y, z]  
+    return np.array([x, y, z], dtype=np.intc)
