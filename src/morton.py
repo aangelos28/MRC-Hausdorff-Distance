@@ -80,7 +80,7 @@ def extract_morton_coords_bin(dim, k, morton_code):
     else:
         return []
 
-@jit(nopython=True, fastmath=True)
+@jit(nopython=True, fastmath=True, cache=True)
 def extract_morton_coords_int_3D(k, morton_code):
     """
     Creates a list containing the extracted coordinates in integer format 
