@@ -229,7 +229,7 @@ def compute_directed_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
     z_order_2 = mrc_z_order(morton_bits, grid2)
 
     max_distance = 0
-    diffusion_center = int(z_order_2.size / 2)
+    diffusion_center = z_order_2.size // 2
 
     temp_point_1 = np.empty(3, dtype=np.intc)
     temp_point_2 = np.empty(3, dtype=np.intc)
