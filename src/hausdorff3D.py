@@ -80,7 +80,8 @@ def compute_hausdorff_distance_3D(grid1, grid2):
 @jit(nopython=True, nogil=True, cache=True)
 def compute_directed_hausdorff_distance_3D(grid1, grid2):
     """
-    Computes and returns the directed Hausdorff distance for two 3D grids of MRC format.
+    Computes and returns the directed Hausdorff distance for two 3D grids of MRC format
+    using the Earlybreak algorithm.
 
     Args:
         grid1: The first grid of points in MRC format (origin)
@@ -184,9 +185,11 @@ def mrc_z_order(k, grid):
 
 def compute_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
     """
-    Computes and returns the Hausdorff distance for two 3D grids of MRC format.
+    Computes and returns the Hausdorff distance for two 3D grids of MRC format
+    using the ZHD algorithm.
 
     Args:
+        morton_bits: Bits to represent each coordinate with in morton code
         grid1: The first grid of points in MRC format
         grid2: The second grid of points in MRC format
 
