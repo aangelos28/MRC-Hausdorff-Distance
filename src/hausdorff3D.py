@@ -2,7 +2,7 @@ import numpy as np
 import mrcfile
 from math import (sqrt, pow, inf)
 from concurrent.futures import ThreadPoolExecutor
-from numba import (jit, int32)
+from numba import jit
 from morton import (morton3D, extract_morton_coords_int_3D)
 
 def point3D_to_mrc_file(output_mrc_filename, origin_grid, point):
@@ -16,7 +16,7 @@ def point3D_to_mrc_file(output_mrc_filename, origin_grid, point):
         point: The point to output
 
     Returns:
-        Handle to new MRC file.
+        Handle to the new MRC file.
     """
 
     # Create a zero array with the same shape as the original

@@ -48,8 +48,8 @@ def main():
         y0_mrc_file.close()
 
         print("Hausdorff Distance: {}".format(result["max_distance"]))
-        print("Point x0: ({},{})".format(result["x0"].x, result["x0"].y))
-        print("Point y0: ({},{})".format(result["y0"].x, result["y0"].y))
+        print("Point x0: ({},{})".format(result["x0"][0], result["x0"][1]))
+        print("Point y0: ({},{})".format(result["y0"][0], result["y0"][1]))
         end = time.time()
 
         print("\nExecution Time: {}s".format(end-start))
