@@ -34,7 +34,7 @@ def main():
         start = time.time()
 
         # Compute the Hausdorff distance
-        result = hausdorff2D.compute_hausdorff_distance_2D(mrc_file_1.data, mrc_file_2.data)
+        result = hausdorff2D.hausdorff_distance_2D(mrc_file_1.data, mrc_file_2.data)
         result = hausdorff_result_to_dict(result)
 
         # Output point x0 to mrc file
@@ -65,9 +65,9 @@ def main():
         # Compute the Hausdorff distance
         result = None
         if args.algorithm == "earlybreak":
-            result = hausdorff3D.compute_hausdorff_distance_3D(mrc_file_1.data, mrc_file_2.data)
+            result = hausdorff3D.hausdorff_distance_3D(mrc_file_1.data, mrc_file_2.data)
         else:
-            result = hausdorff3D.compute_hausdorff_distance_3D_ZHD(12, mrc_file_1.data, mrc_file_2.data)
+            result = hausdorff3D.hausdorff_distance_3D_ZHD(12, mrc_file_1.data, mrc_file_2.data)
 
         result = hausdorff_result_to_dict(result)
 

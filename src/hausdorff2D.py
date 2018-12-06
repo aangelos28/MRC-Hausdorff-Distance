@@ -34,7 +34,7 @@ def point2D_to_mrc_file(output_mrc_filename, origin_plane, point):
 #################################################
 
 @jit(nopython=True, cache=True)
-def compute_euclidean_distance_2D(point1, point2):
+def euclidean_distance_2D(point1, point2):
     """
     Computes and returns the euclidean distance for two points in the 2D plane.
 
@@ -48,7 +48,7 @@ def compute_euclidean_distance_2D(point1, point2):
 
     return sqrt(pow(point1[0] - point2[0], 2) + pow(point1[1] - point2[1], 2))
 
-def compute_hausdorff_distance_2D(plane1, plane2):
+def hausdorff_distance_2D(plane1, plane2):
     """
     Computes and returns the Hausdorff distance for two 2D planes of MRC format
     using the Earlybreak algorithm.
@@ -63,8 +63,8 @@ def compute_hausdorff_distance_2D(plane1, plane2):
 
     executor = ThreadPoolExecutor(max_workers=2)
 
-    future1 = executor.submit(compute_directed_hausdorff_distance_2D, plane1, plane2)
-    future2 = executor.submit(compute_directed_hausdorff_distance_2D, plane1, plane2)
+    future1 = executor.submit(directed_hausdorff_distance_2D, plane1, plane2)
+    future2 = executor.submit(directed_hausdorff_distance_2D, plane1, plane2)
 
     directedDistance1 = future1.result()
     directedDistance2 = future2.result()
@@ -77,7 +77,7 @@ def compute_hausdorff_distance_2D(plane1, plane2):
         return directedDistance2
 
 @jit(nopython=True, nogil=True, cache=True)
-def compute_directed_hausdorff_distance_2D(plane1, plane2):
+def directed_hausdorff_distance_2D(plane1, plane2):
     """
     Computes and returns the directed Hausdorff distance for two 2D planes of MRC format
     using the Earlybreak algorithm.
@@ -120,7 +120,7 @@ def compute_directed_hausdorff_distance_2D(plane1, plane2):
             point2[0] = plane2_index[0]
             point2[1] = plane2_index[1]
 
-            currrent_distance = compute_euclidean_distance_2D(point1, point2)
+            currrent_distance = euclidean_distance_2D(point1, point2)
 
             if currrent_distance <= max_distance:
                 min_distance = 0

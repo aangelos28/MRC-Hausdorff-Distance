@@ -35,7 +35,7 @@ def point3D_to_mrc_file(output_mrc_filename, origin_grid, point):
 #################################################
 
 @jit(nopython=True, cache=True)
-def compute_euclidean_distance_3D(point1, point2):
+def euclidean_distance_3D(point1, point2):
     """
     Computes and returns the euclidean distance for two points in 3D space.
 
@@ -49,7 +49,7 @@ def compute_euclidean_distance_3D(point1, point2):
 
     return sqrt(pow(point1[0] - point2[0], 2) + pow(point1[1] - point2[1], 2) + pow(point1[2] - point2[2], 2))
 
-def compute_hausdorff_distance_3D(grid1, grid2):
+def hausdorff_distance_3D(grid1, grid2):
     """
     Computes and returns the Hausdorff distance for two 3D grids of MRC format
     using the Earlybreak algorithm.
@@ -64,8 +64,8 @@ def compute_hausdorff_distance_3D(grid1, grid2):
 
     executor = ThreadPoolExecutor(max_workers=2)
 
-    future1 = executor.submit(compute_directed_hausdorff_distance_3D, grid1, grid2)
-    future2 = executor.submit(compute_directed_hausdorff_distance_3D, grid2, grid1)
+    future1 = executor.submit(directed_hausdorff_distance_3D, grid1, grid2)
+    future2 = executor.submit(directed_hausdorff_distance_3D, grid2, grid1)
 
     directedDistance1 = future1.result()
     directedDistance2 = future2.result()
@@ -78,7 +78,7 @@ def compute_hausdorff_distance_3D(grid1, grid2):
         return directedDistance2
 
 @jit(nopython=True, nogil=True, cache=True)
-def compute_directed_hausdorff_distance_3D(grid1, grid2):
+def directed_hausdorff_distance_3D(grid1, grid2):
     """
     Computes and returns the directed Hausdorff distance for two 3D grids of MRC format
     using the Earlybreak algorithm.
@@ -123,7 +123,7 @@ def compute_directed_hausdorff_distance_3D(grid1, grid2):
             point2[1] = grid2_index[1]
             point2[2] = grid2_index[2]
 
-            currrent_distance = compute_euclidean_distance_3D(point1, point2)
+            currrent_distance = euclidean_distance_3D(point1, point2)
 
             if currrent_distance <= max_distance:
                 min_distance = 0
@@ -183,7 +183,7 @@ def mrc_z_order(k, grid):
 
     return np.sort(z_order_array)
 
-def compute_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
+def hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
     """
     Computes and returns the Hausdorff distance for two 3D grids of MRC format
     using the ZHD algorithm.
@@ -199,8 +199,8 @@ def compute_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
 
     executor = ThreadPoolExecutor(max_workers=2)
 
-    future1 = executor.submit(compute_directed_hausdorff_distance_3D_ZHD, morton_bits, grid1, grid2)
-    future2 = executor.submit(compute_directed_hausdorff_distance_3D_ZHD, morton_bits, grid2, grid1)
+    future1 = executor.submit(directed_hausdorff_distance_3D_ZHD, morton_bits, grid1, grid2)
+    future2 = executor.submit(directed_hausdorff_distance_3D_ZHD, morton_bits, grid2, grid1)
 
     directedDistance1 = future1.result()
     directedDistance2 = future2.result()
@@ -213,7 +213,7 @@ def compute_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
         return directedDistance2
 
 @jit(nopython=True, fastmath=True, cache=True)
-def compute_directed_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
+def directed_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
     """
     Computes and returns the directed Hausdorff distance for two 3D grids of MRC format
     using the ZHD algorithm.
@@ -263,7 +263,7 @@ def compute_directed_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
                 temp_point_2[1] = extracted_coords_2[1]
                 temp_point_2[2] = extracted_coords_2[2]
 
-                left_distance = compute_euclidean_distance_3D(temp_point_1, temp_point_2)
+                left_distance = euclidean_distance_3D(temp_point_1, temp_point_2)
 
             if k < z_order_2.size:
                 extracted_coords_1 = extract_morton_coords_int_3D(k=morton_bits, morton_code=z_order_1[i])
@@ -277,7 +277,7 @@ def compute_directed_hausdorff_distance_3D_ZHD(morton_bits, grid1, grid2):
                 temp_point_2[1] = extracted_coords_2[1]
                 temp_point_2[2] = extracted_coords_2[2]
 
-                right_distance = compute_euclidean_distance_3D(temp_point_1, temp_point_2)
+                right_distance = euclidean_distance_3D(temp_point_1, temp_point_2)
 
             if left_distance < right_distance and left_distance < min_distance:
                 min_distance = left_distance
