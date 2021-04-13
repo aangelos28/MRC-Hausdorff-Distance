@@ -1,5 +1,5 @@
 # MRC Hausdorff Distance
-A tool for computing the Hausdorff distance of two MRC files.
+A tool for quickly computing the Hausdorff distance of two MRC files.
 
 Implements the Earlybreak [1] and ZHD [2] algorithms.
 
