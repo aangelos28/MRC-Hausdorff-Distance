@@ -28,9 +28,9 @@ def point2D_to_mrc_file(output_mrc_filename, origin_plane, point):
     new_plane[int(point[0]), int(point[1])] = max_element * 2
 
     return mrcfile.new(name=output_mrc_filename, data=new_plane, overwrite=True)
-    
+
 #################################################
-# EARLYBREAK        
+# EARLYBREAK
 #################################################
 
 @jit(nopython=True, cache=True)
@@ -101,7 +101,7 @@ def directed_hausdorff_distance_2D(plane1, plane2):
 
     point_min = np.zeros(2, np.intc)
     point_max = np.zeros(2, np.intc)
-        
+
     # Iterate over all points in grid 1
     for plane1_index, plane1_value in np.ndenumerate(plane1):
 
@@ -111,7 +111,7 @@ def directed_hausdorff_distance_2D(plane1, plane2):
         point1[1] = plane1_index[1]
 
         min_distance = inf
-            
+
         # Iterate over all points in grid 2
         for plane2_index, plane2_value in np.ndenumerate(plane2):
 

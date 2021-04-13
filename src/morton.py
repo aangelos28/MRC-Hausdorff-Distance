@@ -36,7 +36,7 @@ def morton2D(k, x, y):
         The morton code in integer format of the x, y coordinates of size 2*k
     """
 
-    result = (x << k) + y 
+    result = (x << k) + y
 
     return result
 
@@ -57,7 +57,7 @@ def morton_to_string(dim, k, morton_code):
 
 def extract_morton_coords_bin(dim, k, morton_code):
     """
-    Creates a list containing the extracted coordinates in binary format 
+    Creates a list containing the extracted coordinates in binary format
     from the morton code in the order in which they were encoded
 
     Args:
@@ -84,7 +84,7 @@ def extract_morton_coords_bin(dim, k, morton_code):
 @jit(nopython=True, fastmath=True, cache=True)
 def extract_morton_coords_int_3D(k, morton_code):
     """
-    Creates a list containing the extracted coordinates in integer format 
+    Creates a list containing the extracted coordinates in integer format
     from the morton code in the order in which they were encoded
 
     Args:
