@@ -34,7 +34,7 @@ def main():
         start = time.time()
 
         # Compute the Hausdorff distance
-        result = hausdorff2D.compute_hausdorff_distance_2D(mrc_file_1.data, mrc_file_2.data)
+        result = hausdorff2D.hausdorff_distance_2D(mrc_file_1.data, mrc_file_2.data)
         result = hausdorff_result_to_dict(result)
 
         # Output point x0 to mrc file
@@ -48,8 +48,8 @@ def main():
         y0_mrc_file.close()
 
         print("Hausdorff Distance: {}".format(result["max_distance"]))
-        print("Point x0: ({},{})".format(result["x0"].x, result["x0"].y))
-        print("Point y0: ({},{})".format(result["y0"].x, result["y0"].y))
+        print("Point x0: ({},{})".format(result["x0"][0], result["x0"][1]))
+        print("Point y0: ({},{})".format(result["y0"][0], result["y0"][1]))
         end = time.time()
 
         print("\nExecution Time: {}s".format(end-start))
@@ -65,9 +65,9 @@ def main():
         # Compute the Hausdorff distance
         result = None
         if args.algorithm == "earlybreak":
-            result = hausdorff3D.compute_hausdorff_distance_3D(mrc_file_1.data, mrc_file_2.data)
+            result = hausdorff3D.hausdorff_distance_3D(mrc_file_1.data, mrc_file_2.data)
         else:
-            result = hausdorff3D.compute_hausdorff_distance_3D_ZHD(8, mrc_file_1.data, mrc_file_2.data)
+            result = hausdorff3D.hausdorff_distance_3D_ZHD(12, mrc_file_1.data, mrc_file_2.data)
 
         result = hausdorff_result_to_dict(result)
 
@@ -82,8 +82,8 @@ def main():
         y0_mrc_file.close()
 
         print("Hausdorff Distance: {}".format(result["max_distance"]))
-        print("Point x0: ({},{},{})".format(result["x0"].x, result["x0"].y, result["x0"].z))
-        print("Point y0: ({},{},{})".format(result["y0"].x, result["y0"].y, result["y0"].z))
+        print("Point x0: ({},{},{})".format(result["x0"][0], result["x0"][1], result["x0"][2]))
+        print("Point y0: ({},{},{})".format(result["y0"][0], result["y0"][1], result["y0"][2]))
         end = time.time()
 
         print("\nExecution Time: {}s".format(end-start))

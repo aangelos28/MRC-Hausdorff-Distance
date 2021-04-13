@@ -1,5 +1,7 @@
 from numba import jit
+import numpy as np
 
+@jit(nopython=True, nogil=True, cache=True)
 def morton3D(k, x, y, z):
     """
     Computes and returns the morton code of the x, y, z coordinates each
@@ -19,6 +21,7 @@ def morton3D(k, x, y, z):
 
     return result
 
+@jit(nopython=True, nogil=True, cache=True)
 def morton2D(k, x, y):
     """
     Computes and returns the morton code of the x, y coordinates each
@@ -33,7 +36,7 @@ def morton2D(k, x, y):
         The morton code in integer format of the x, y coordinates of size 2*k
     """
 
-    result = (x << k) + y 
+    result = (x << k) + y
 
     return result
 
@@ -54,7 +57,7 @@ def morton_to_string(dim, k, morton_code):
 
 def extract_morton_coords_bin(dim, k, morton_code):
     """
-    Creates a list containing the extracted coordinates in binary format 
+    Creates a list containing the extracted coordinates in binary format
     from the morton code in the order in which they were encoded
 
     Args:
@@ -78,9 +81,10 @@ def extract_morton_coords_bin(dim, k, morton_code):
     else:
         return []
 
-def extract_morton_coords_int(dim, k, morton_code):
+@jit(nopython=True, fastmath=True, cache=True)
+def extract_morton_coords_int_3D(k, morton_code):
     """
-    Creates a list containing the extracted coordinates in integer format 
+    Creates a list containing the extracted coordinates in integer format
     from the morton code in the order in which they were encoded
 
     Args:
@@ -92,14 +96,8 @@ def extract_morton_coords_int(dim, k, morton_code):
         List containing the extracted coordinates in integer format
     """
 
-    morton_code_str = morton_to_string(dim, k, morton_code)
+    x = morton_code >> 2*k
+    y = (morton_code >> k) & ((1 << (2*k - k)) - 1)
+    z = morton_code & ((1 << k) - 1)
 
-    # 3D
-    if dim == 3:
-        return [int(morton_code_str[0:k], 2), int(morton_code_str[k:2*k], 2), int(morton_code_str[2*k:3*k], 2)]
-
-    # 2D
-    elif dim == 2:
-        return [int(morton_code_str[0:k], 2), int(morton_code_str[k:2*k], 2)]
-    else:
-        return []
+    return np.array([x, y, z], dtype=np.intc)
