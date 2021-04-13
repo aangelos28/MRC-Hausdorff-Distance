@@ -18,7 +18,7 @@ def main():
 
     args = parse_arguments()
 
-    #np.set_printoptions(threshold=np.inf)
+    print(args)
 
     mrc_file_1 = readMRCFile(args.mrc1)
     mrc_file_2 = readMRCFile(args.mrc2)
@@ -40,10 +40,10 @@ def main():
         result = hausdorff_result_to_dict(result)
 
         # Output point x0 to mrc file
-        x0_mrc_file = hausdorff2D.point2D_to_mrc_file(args.output_mrc1, result["x0_origin"], result["x0"])
+        x0_mrc_file = hausdorff2D.point2D_to_mrc_file(args.output_mrc_x0, result["x0_origin"], result["x0"])
 
         # Output point y0 to mrc file
-        y0_mrc_file = hausdorff2D.point2D_to_mrc_file(args.output_mrc2, result["y0_origin"], result["y0"])
+        y0_mrc_file = hausdorff2D.point2D_to_mrc_file(args.output_mrc_y0, result["y0_origin"], result["y0"])
 
         # Close output mrc files
         x0_mrc_file.close()
@@ -74,10 +74,10 @@ def main():
         result = hausdorff_result_to_dict(result)
 
         # Output point x0 to mrc file
-        x0_mrc_file = hausdorff3D.point3D_to_mrc_file(args.output_mrc1, result["x0_origin"], result["x0"])
+        x0_mrc_file = hausdorff3D.point3D_to_mrc_file(args.output_mrc_x0, result["x0_origin"], result["x0"])
 
         # Output point y0 to mrc file
-        y0_mrc_file = hausdorff3D.point3D_to_mrc_file(args.output_mrc2, result["y0_origin"], result["y0"])
+        y0_mrc_file = hausdorff3D.point3D_to_mrc_file(args.output_mrc_y0, result["y0_origin"], result["y0"])
 
         # Close output mrc files
         x0_mrc_file.close()
@@ -142,8 +142,8 @@ def parse_arguments():
 
     parser.add_argument("--mrc1", required=True, help="The first set of points in MRC format", dest="mrc1")
     parser.add_argument("--mrc2", required=True, help="The second set of points in MRC format", dest="mrc2")
-    parser.add_argument("--outputMrc1", required=True, help="The output x0 point in MRC format.", dest="output_mrc1")
-    parser.add_argument("--outputMrc2", required=True, help="The output y0 point in MRC format.", dest="output_mrc2")
+    parser.add_argument("--x0-output", required=True, help="The output x0 point in MRC format.", dest="output_mrc_x0")
+    parser.add_argument("--y0-output", required=True, help="The output y0 point in MRC format.", dest="output_mrc_y0")
     parser.add_argument("--algorithm", "-a", required=False, choices=["earlybreak", "zhd"], default="earlybreak", help="The algorithm to use.", dest="algorithm")
 
     return parser.parse_args()
